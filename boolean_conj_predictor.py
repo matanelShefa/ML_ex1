@@ -3,14 +3,28 @@ import sys
 
 
 def hypothesis_fix(hypothesis_to_fix, current_example):
-
     # Check the hypothesis and fix it if needed.
     for i in range(0, d - 1):
         i_bit = current_example[i]
-        if (i_bit == 0) & (1 in hypothesis_to_fix[i]):
+        if (i_bit == 0) and (1 in hypothesis_to_fix[i]):
             hypothesis_to_fix[i].remove(1)
-        if (i_bit == 1) & (0 in hypothesis_to_fix[i]):
+        if (i_bit == 1) and (0 in hypothesis_to_fix[i]):
             hypothesis_to_fix[i].remove(0)
+
+
+def get_xi_assignment(i_index, i_hypothesis):
+    # Flag for the case of Xi,not(Xi)
+    double_variable = 0
+    return_string = ''
+
+    if 1 in i_hypothesis:
+        return_string = return_string + 'x' + str(i_index)
+        double_variable = 1
+    if 0 in i_hypothesis:
+        if double_variable == 1:
+            return_string = return_string + ','
+        return_string = return_string + 'not(x' + str(i_index) + ')'
+    return return_string
 
 
 # Get the input.
@@ -68,18 +82,14 @@ for i in range(0, len(yVector)):
 # Build the final hypothesis.
 finalHypothesis = ''
 i = 1
+
 for variable in hypothesis:
-    if 0 in variable:
-        finalHypothesis = finalHypothesis + 'x' + str(i)
-        if i != len(hypothesis):
+    xiAssignment = get_xi_assignment(i, variable)
+    if xiAssignment != '':
+        if finalHypothesis != '':
             finalHypothesis = finalHypothesis + ','
-    if 1 in variable:
-        finalHypothesis = finalHypothesis + 'not(x' + str(i) + ')'
-        if i != len(hypothesis):
-            finalHypothesis = finalHypothesis + ','
-
+        finalHypothesis = finalHypothesis + xiAssignment
     i = i + 1
-
 
 # Print to the output file.
 outputFile = open('./output.txt', 'w+')
